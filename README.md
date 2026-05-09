@@ -4,6 +4,8 @@
 
 当前站点名称：`Dylan的博客`
 
+当前线上地址：`https://piio.me`
+
 当前仓库：`https://github.com/DylanLim1999/dylan-garden.git`
 
 ## 1. 项目现在是什么状态
