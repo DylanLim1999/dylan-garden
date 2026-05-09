@@ -1,5 +1,5 @@
 ---
-title: 笔记
+title: Notes
 date: 2026-05-09
 ---
 
