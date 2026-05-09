@@ -35,13 +35,12 @@ body {
 
 p,
 ul,
-text,
+ol,
+li,
 a,
 tr,
 td,
-li,
-ol,
-ul,
+text,
 .katex,
 .math,
 .typst-doc,
@@ -50,6 +49,7 @@ g[class~="typst-text"] {
   fill: var(--darkgray);
   overflow-wrap: break-word;
   text-wrap: pretty;
+  line-height: 1.6rem;
 }
 
 path[class~="typst-shape"] {
@@ -84,7 +84,9 @@ strong {
 a {
   font-weight: $semiBoldWeight;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
   color: var(--secondary);
 
   &:hover {
@@ -426,7 +428,6 @@ figure[data-rehype-pretty-code-figure] {
   margin: 0;
   position: relative;
   line-height: 1.6rem;
-  position: relative;
 
   & > [data-rehype-pretty-code-title] {
     font-family: var(--codeFont);
@@ -509,12 +510,6 @@ code {
   border-radius: 5px;
   padding: 0.1rem 0.2rem;
   background: var(--lightgray);
-}
-
-tbody,
-li,
-p {
-  line-height: 1.6rem;
 }
 
 .table-container {
