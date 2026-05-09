@@ -21,10 +21,10 @@ const config: QuartzConfig = {
       fontOrigin: "local",
       cdnCaching: false,
       typography: {
-        title: "Noto Serif SC",
-        header: "Noto Serif SC",
-        body: "Noto Sans SC",
-        code: "JetBrains Mono",
+        title: "Verdana",
+        header: "Verdana",
+        body: "Verdana",
+        code: "monospace",
       },
       colors: {
         lightMode: {

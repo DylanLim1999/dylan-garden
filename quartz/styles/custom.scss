@@ -6,11 +6,10 @@
 body {
   position: relative;
   min-height: 100vh;
-  font-family:
-    "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  font-family: var(--bodyFont);
   font-size: 16px;
-  line-height: 1.82;
-  letter-spacing: 0.01em;
+  line-height: 1.8em;
+  letter-spacing: 0.02em;
 
   // only allow synthesizing italics but not bold
   font-synthesis: style;
@@ -301,9 +300,11 @@ h4,
 h5,
 h6,
 .page-title {
-  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "Noto Sans SC", serif;
+  font-family:
+    Verdana, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
   letter-spacing: 0;
-  line-height: 1.38;
+  line-height: 1.4em;
 }
 
 .center,
@@ -313,17 +314,19 @@ article {
 
 .center p,
 article p {
+  letter-spacing: 0.02em;
+  line-height: 1.8em;
   margin: 1.05rem 0;
 }
 
 li {
-  line-height: 1.78;
+  line-height: 1.9rem;
 }
 
 code,
 pre {
   font-family:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 hr {
