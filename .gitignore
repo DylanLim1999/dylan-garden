@@ -1,0 +1,16 @@
+.DS_Store
+node_modules
+public
+prof
+tsconfig.tsbuildinfo
+.obsidian
+.quartz-cache
+private/
+.replit
+replit.nix
+screenshots/
+quartz-serve*.log
+.chrome-headless-profile/
+task_plan.md
+findings.md
+progress.md
