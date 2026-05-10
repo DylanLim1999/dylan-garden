@@ -49,13 +49,12 @@ function dateTime(value: string | undefined): number {
 
 function formatDate(value: string | undefined): string {
   const time = dateTime(value)
-  if (time === 0) return "未记录"
-
-  return new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(time))
+  if (time === 0) return "--"
+  const d = new Date(time)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${m}-${day}`
 }
 
 function coverUrl(currentSlug: FullSlug, cover: string | undefined): string | undefined {
@@ -93,17 +92,6 @@ function sortRecent(a: MediaItem, b: MediaItem): number {
   return a.title.localeCompare(b.title, "zh-Hans-CN", { numeric: true, sensitivity: "base" })
 }
 
-function statusText(item: MediaItem): string {
-  if (item.status === "listened") return "听过"
-  if (item.status === "watching") return "在看"
-  if (item.status === "listening") return "在听"
-  if (item.status === "paused") return "暂停"
-  return kindMeta[item.kind].statusLabel
-}
-
-function tagLabel(tag: string): string {
-  return tag.replace(/\//g, " / ")
-}
 
 function Cover({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }) {
   const src = coverUrl(currentSlug, item.cover)
@@ -111,7 +99,7 @@ function Cover({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }
   if (src) {
     return (
       <img
-        class={`media-cover media-cover-${item.kind}`}
+        class={`mi-cover mi-cover-${item.kind}`}
         src={src}
         alt={`${item.title} 封面`}
         loading="lazy"
@@ -122,7 +110,7 @@ function Cover({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }
 
   return (
     <div
-      class={`media-cover media-cover-${item.kind} media-cover-fallback`}
+      class={`mi-cover mi-cover-${item.kind} mi-cover-fallback`}
       aria-label={`${item.title} 封面占位`}
     >
       <span>{item.year}</span>
@@ -133,63 +121,26 @@ function Cover({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }
 
 function FeatureCard({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }) {
   return (
-    <a class="media-feature-card internal" href={resolveRelative(currentSlug, item.slug)}>
+    <a class="mi-feat-card internal" href={resolveRelative(currentSlug, item.slug)}>
       <Cover item={item} currentSlug={currentSlug} />
-      <span class="media-feature-copy">
-        <span class="media-feature-kind">{kindMeta[item.kind].label}</span>
+      <div class="mi-feat-copy">
+        <span class="mi-feat-kind">{kindMeta[item.kind].label}</span>
         <strong>{item.title}</strong>
-        <span>{item.summary}</span>
-      </span>
+        {item.summary && <p>{item.summary}</p>}
+      </div>
     </a>
   )
 }
 
-function MediaRow({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }) {
-  const visibleTags = item.tags.filter((tag) => !tag.startsWith("media/")).slice(0, 2)
-
+function PosterCard({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }) {
   return (
-    <article class="media-entry">
-      <a class="media-entry-cover internal" href={resolveRelative(currentSlug, item.slug)}>
-        <Cover item={item} currentSlug={currentSlug} />
-      </a>
-      <div class="media-entry-main">
-        <p class="media-entry-meta">
-          <span>{kindMeta[item.kind].label}</span>
-          {item.year && <span>{item.year}</span>}
-          {item.creator && <span>{item.creator}</span>}
-        </p>
-        <h3>
-          <a class="internal" href={resolveRelative(currentSlug, item.slug)}>
-            {item.title}
-          </a>
-        </h3>
-        {item.summary && <p class="media-entry-summary">{item.summary}</p>}
-        {visibleTags.length > 0 && (
-          <ul class="media-tags">
-            {visibleTags.map((tag) => (
-              <li>
-                <a
-                  class="internal tag-link"
-                  href={resolveRelative(currentSlug, `tags/${tag}` as FullSlug)}
-                >
-                  {tagLabel(tag)}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
+    <a class="mi-poster internal" href={resolveRelative(currentSlug, item.slug)}>
+      <Cover item={item} currentSlug={currentSlug} />
+      <div class="mi-poster-info">
+        <strong>{item.title}</strong>
+        {item.year && <span class="mi-poster-year">{item.year}</span>}
       </div>
-      <dl class="media-entry-facts">
-        <div>
-          <dt>状态</dt>
-          <dd>{statusText(item)}</dd>
-        </div>
-        <div>
-          <dt>日期</dt>
-          <dd>{formatDate(item.finished)}</dd>
-        </div>
-      </dl>
-    </article>
+    </a>
   )
 }
 
@@ -202,63 +153,52 @@ const MediaIndex: QuartzComponent = ({ allFiles, fileData }: QuartzComponentProp
 
   if (items.length === 0) {
     return (
-      <section class="media-index media-empty" aria-labelledby="media-index-title">
-        <h2 id="media-index-title">还没有条目</h2>
+      <section class="mi-root mi-empty" aria-labelledby="mi-title">
+        <h2 id="mi-title">还没有条目</h2>
         <p>在 media 目录里添加带有 kind 字段的 Markdown，就会出现在这里。</p>
       </section>
     )
   }
 
-  const groups = kindOrder.map((kind) => ({
-    kind,
-    items: items.filter((item) => item.kind === kind),
-  }))
+  const groups = kindOrder
+    .map((kind) => ({
+      kind,
+      items: items.filter((item) => item.kind === kind),
+    }))
+    .filter((g) => g.items.length > 0)
+
   const featured = items.filter((item) => item.featured).sort(sortRecent)
-  const latest = items[0]
 
   return (
-    <section class="media-index" aria-labelledby="media-index-title">
-      <div class="media-dashboard">
+    <section class="mi-root" aria-labelledby="mi-title">
+      <header class="mi-header">
         <div>
-          <p class="media-kicker">Archive / {String(items.length).padStart(2, "0")} entries</p>
-          <h2 id="media-index-title">一间小型私人资料室</h2>
-          <p>不是完整目录和推荐清单，慢慢记录我看过听过的一些喜欢的作品。</p>
+          <p class="mi-kicker">Archive / {String(items.length).padStart(2, "0")} entries</p>
+          <h2 id="mi-title">一间小型私人资料室</h2>
+          <p class="mi-desc">不是完整目录和推荐清单，慢慢记录我看过听过的一些喜欢的作品。</p>
         </div>
-        <dl class="media-stats" aria-label="媒体档案统计">
-          <div>
-            <dt>记录</dt>
-            <dd>{items.length}</dd>
-          </div>
-          <div>
-            <dt>精选</dt>
-            <dd>{featured.length}</dd>
-          </div>
-          <div>
-            <dt>最近</dt>
-            <dd>{latest ? formatDate(latest.finished) : "未记录"}</dd>
-          </div>
-        </dl>
-      </div>
+      </header>
 
-      <nav class="media-kind-nav" aria-label="媒体分类">
-        {groups.map(({ kind, items }) => (
-          <a class="internal" href={`#media-${kind}`}>
-            <span>{kindMeta[kind].label}</span>
-            <small>
-              {items.length}
-              {kindMeta[kind].noun}
-            </small>
-          </a>
-        ))}
-      </nav>
+      {groups.length > 1 && (
+        <nav class="mi-nav" aria-label="媒体分类">
+          {groups.map(({ kind, items: kindItems }) => (
+            <a class="internal" href={`#mi-${kind}`}>
+              <span>{kindMeta[kind].label}</span>
+              <small>
+                {kindItems.length}
+                {kindMeta[kind].noun}
+              </small>
+            </a>
+          ))}
+        </nav>
+      )}
 
       {featured.length > 0 && (
-        <section class="media-featured" aria-labelledby="media-featured-title">
-          <div class="media-section-heading">
+        <section class="mi-featured" aria-labelledby="mi-feat-title">
+          <div class="mi-section-head">
             <p>精选</p>
-            <h2 id="media-featured-title">几条可以先看的记录</h2>
           </div>
-          <div class="media-feature-grid">
+          <div class="mi-feat-grid">
             {featured.map((item) => (
               <FeatureCard item={item} currentSlug={currentSlug} />
             ))}
@@ -266,26 +206,21 @@ const MediaIndex: QuartzComponent = ({ allFiles, fileData }: QuartzComponentProp
         </section>
       )}
 
-      <div class="media-catalog">
-        {groups.map(({ kind, items }) => (
-          <section
-            class="media-kind-section"
-            id={`media-${kind}`}
-            aria-labelledby={`media-${kind}-title`}
-          >
-            <div class="media-kind-heading">
-              <div>
-                <p>{kindMeta[kind].label}</p>
-                <h2 id={`media-${kind}-title`}>{kindMeta[kind].label}记录</h2>
-              </div>
-              <span>
-                {items.length}
-                {kindMeta[kind].noun}
-              </span>
+      <div class="mi-catalog">
+        {groups.map(({ kind, items: kindItems }) => (
+          <section class="mi-kind-section" id={`mi-${kind}`} aria-labelledby={`mi-${kind}-title`}>
+            <div class="mi-kind-head">
+              <h2 id={`mi-${kind}-title`}>
+                {kindMeta[kind].label}
+                <span class="mi-kind-count">
+                  {kindItems.length}
+                  {kindMeta[kind].noun}
+                </span>
+              </h2>
             </div>
-            <div class="media-entry-list">
-              {items.slice(0, 10).map((item) => (
-                <MediaRow item={item} currentSlug={currentSlug} />
+            <div class={`mi-poster-grid mi-poster-grid-${kind}`}>
+              {kindItems.map((item) => (
+                <PosterCard item={item} currentSlug={currentSlug} />
               ))}
             </div>
           </section>
@@ -296,362 +231,317 @@ const MediaIndex: QuartzComponent = ({ allFiles, fileData }: QuartzComponentProp
 }
 
 MediaIndex.css = `
-.media-index {
-  margin-top: 2rem;
+.mi-root {
+  margin-top: 1.5rem;
 }
 
-.media-dashboard {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(14rem, 0.55fr);
-  gap: 1.25rem;
-  align-items: stretch;
-  padding: 1.25rem 0 1.5rem;
-  border-top: 1px solid var(--lightgray);
+/* ── Header ── */
+.mi-header {
+  padding: 1.2rem 0 1.4rem;
   border-bottom: 1px solid var(--lightgray);
 }
 
-.media-dashboard h2,
-.media-section-heading h2,
-.media-kind-heading h2 {
+.mi-header h2 {
   margin: 0;
-  text-wrap: balance;
+  font-size: 1.45rem;
+  line-height: 1.4;
+  max-width: 14em;
 }
 
-.media-dashboard h2 {
-  max-width: 13em;
-  font-size: 1.62rem;
-  line-height: 1.45;
-}
-
-.media-dashboard p {
-  max-width: 48rem;
-  margin: 0.7rem 0 0;
-  text-wrap: pretty;
-}
-
-.media-kicker,
-.media-section-heading p,
-.media-kind-heading p,
-.media-feature-kind,
-.media-entry-meta,
-.media-entry-facts dt {
-  margin: 0;
+.mi-kicker {
+  margin: 0 0 0.15rem;
   color: var(--gray);
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: 0.75rem;
+  font-family: var(--codeFont);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
-.media-stats {
-  display: grid;
-  grid-template-columns: 1fr;
+.mi-desc {
+  max-width: 36em;
+  margin: 0.45rem 0 0;
+  color: var(--darkgray);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+/* ── Category nav ── */
+.mi-nav {
+  display: flex;
   gap: 0;
   margin: 0;
+  border-bottom: 1px solid var(--lightgray);
+}
+
+.mi-nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem 0.7rem 0;
+  font-weight: 500;
+  transition: color 180ms ease;
+}
+
+.mi-nav a + a {
+  padding-left: 1rem;
   border-left: 1px solid var(--lightgray);
 }
 
-.media-stats > div {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr;
-  gap: 0.75rem;
-  align-items: baseline;
-  padding: 0.65rem 0 0.65rem 1rem;
-  border-bottom: 1px solid var(--lightgray);
+.mi-nav span {
+  color: var(--dark);
+  font-size: 0.88rem;
 }
 
-.media-stats > div:last-child {
-  border-bottom: 0;
+.mi-nav small {
+  color: var(--gray);
+  font-family: var(--codeFont);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.media-stats dt,
-.media-stats dd,
-.media-entry-facts dt,
-.media-entry-facts dd {
+.mi-nav a:hover span {
+  color: var(--secondary);
+}
+
+/* ── Section headings ── */
+.mi-section-head {
+  margin-bottom: 0.8rem;
+}
+
+.mi-section-head p {
+  margin: 0;
+  color: var(--gray);
+  font-size: 0.75rem;
+}
+
+.mi-section-head h2 {
   margin: 0;
 }
 
-.media-stats dd {
-  color: var(--dark);
-  font-family: var(--codeFont);
-  font-size: 1.15rem;
-  line-height: 1.2;
-  font-variant-numeric: tabular-nums;
+/* ── Featured grid ── */
+.mi-featured {
+  margin-top: 1.8rem;
 }
 
-.media-kind-nav {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin: 1rem 0 2rem;
-}
-
-.media-kind-nav a {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: baseline;
-  min-width: 0;
-  padding: 0.68rem 0.8rem;
-  border: 1px solid var(--lightgray);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--light) 86%, var(--lightgray));
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease;
-}
-
-.media-kind-nav a:hover {
-  border-color: var(--secondary);
-  transform: translateY(-1px);
-}
-
-.media-kind-nav span {
-  color: var(--dark);
-}
-
-.media-kind-nav small {
-  color: var(--gray);
-  font-family: var(--codeFont);
-  font-variant-numeric: tabular-nums;
-}
-
-.media-section-heading {
-  display: grid;
-  gap: 0.2rem;
-  margin-bottom: 0.9rem;
-}
-
-.media-feature-grid {
+.mi-feat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
-.media-index a.media-feature-card {
+.mi-root a.mi-feat-card {
   display: grid;
-  grid-template-columns: 5.6rem minmax(0, 1fr);
+  grid-template-columns: 5.2rem minmax(0, 1fr);
   gap: 0.85rem;
-  align-items: center;
-  min-width: 0;
-  padding: 0.75rem;
-  border: 1px solid var(--lightgray);
+  align-items: start;
+  padding: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--lightgray) 80%, transparent);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--light) 92%, var(--lightgray));
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease;
+  background: color-mix(in srgb, var(--light) 94%, var(--lightgray));
+  transition: border-color 200ms ease, transform 200ms ease;
 }
 
-.media-index a.media-feature-card:hover {
-  border-color: var(--secondary);
+.mi-root a.mi-feat-card:hover {
+  border-color: color-mix(in srgb, var(--secondary) 35%, var(--lightgray));
   transform: translateY(-1px);
 }
 
-.media-feature-copy {
+.mi-feat-copy {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.2rem;
   min-width: 0;
-  overflow-wrap: anywhere;
+  padding-top: 0.1rem;
 }
 
-.media-feature-copy strong {
+.mi-feat-kind {
+  color: var(--gray);
+  font-size: 0.72rem;
+}
+
+.mi-feat-copy strong {
   color: var(--dark);
+  font-size: 0.94rem;
   line-height: 1.35;
 }
 
-.media-feature-copy span:last-child {
+.mi-feat-copy p {
+  margin: 0.15rem 0 0;
   color: var(--darkgray);
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   line-height: 1.55;
-  text-wrap: pretty;
+  overflow-wrap: anywhere;
 }
 
-.media-cover {
+/* ── Cover ── */
+.mi-cover {
   display: block;
   width: 100%;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 5px;
   border: 1px solid color-mix(in srgb, var(--lightgray) 72%, var(--gray));
   background: var(--lightgray);
 }
 
-.media-cover-album {
+.mi-cover-album {
   aspect-ratio: 1;
 }
 
-.media-cover-fallback {
+.mi-cover-fallback {
   box-sizing: border-box;
   display: grid;
   align-content: end;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  gap: 0.4rem;
+  padding: 0.6rem;
 }
 
-.media-cover-fallback span {
+.mi-cover-fallback span {
   color: var(--gray);
   font-family: var(--codeFont);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
-.media-cover-fallback strong {
+.mi-cover-fallback strong {
   color: var(--dark);
+  font-size: 0.82rem;
   line-height: 1.25;
 }
 
-.media-catalog {
-  display: grid;
-  gap: 2.2rem;
-  margin-top: 2.4rem;
+/* ── Catalog ── */
+.mi-catalog {
+  margin-top: 2rem;
 }
 
-.media-kind-section {
+.mi-kind-section {
   scroll-margin-top: 1.5rem;
 }
 
-.media-kind-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: end;
-  margin-bottom: 0.8rem;
-  padding-top: 1.1rem;
-  border-top: 1px solid var(--lightgray);
+.mi-kind-section + .mi-kind-section {
+  margin-top: 2rem;
 }
 
-.media-kind-heading > span {
+.mi-kind-head {
+  padding-top: 1rem;
+  border-top: 1px solid var(--lightgray);
+  margin-bottom: 0.5rem;
+}
+
+.mi-kind-head h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.mi-kind-count {
   color: var(--gray);
   font-family: var(--codeFont);
-  font-size: 0.88rem;
+  font-size: 0.75rem;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Poster grid ── */
+.mi-poster-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.9rem 0.7rem;
+}
+
+.mi-poster-grid-album {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mi-root a.mi-poster {
+  display: block;
+  text-decoration: none;
+  transition: transform 200ms ease;
+}
+
+.mi-root a.mi-poster:hover {
+  transform: translateY(-2px);
+}
+
+.mi-root a.mi-poster:hover .mi-cover {
+  border-color: color-mix(in srgb, var(--secondary) 50%, var(--lightgray));
+}
+
+.mi-poster-info {
+  padding: 0.4rem 0.1rem 0;
+}
+
+.mi-poster-info strong {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.media-entry-list {
-  display: grid;
-  gap: 0;
-}
-
-.media-entry {
-  display: grid;
-  grid-template-columns: 4.75rem minmax(0, 1fr) minmax(7rem, 0.22fr);
-  gap: 0.9rem;
-  align-items: start;
-  padding: 0.85rem 0;
-  border-top: 1px solid color-mix(in srgb, var(--lightgray) 78%, transparent);
-}
-
-.media-entry:last-child {
-  border-bottom: 1px solid color-mix(in srgb, var(--lightgray) 78%, transparent);
-}
-
-.media-entry-cover {
+.mi-poster-year {
   display: block;
-}
-
-.media-entry h3 {
-  margin: 0.2rem 0 0;
-  font-size: 1rem;
-  line-height: 1.45;
-}
-
-.media-entry-summary {
-  margin: 0.25rem 0 0;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
-  text-wrap: pretty;
-}
-
-.media-entry-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.55rem;
-}
-
-.media-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: 0.55rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.media-tags li {
-  line-height: 1;
-}
-
-.media-tags a {
-  font-size: 0.78rem;
-  line-height: 1.3;
-}
-
-.media-entry-facts {
-  display: grid;
-  gap: 0.55rem;
-  margin: 0;
-  text-align: right;
-}
-
-.media-entry-facts dd {
-  color: var(--dark);
+  color: var(--gray);
   font-family: var(--codeFont);
-  font-size: 0.88rem;
-  line-height: 1.3;
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
+  margin-top: 0.1rem;
 }
 
-.media-empty {
-  padding: 1rem 0;
-  border-top: 1px solid var(--lightgray);
+/* ── Empty state ── */
+.mi-empty {
+  padding: 2rem 0;
 }
 
+.mi-empty h2 {
+  margin: 0;
+}
+
+.mi-empty p {
+  margin: 0.4rem 0 0;
+  color: var(--gray);
+  font-size: 0.88rem;
+}
+
+/* ── Responsive ── */
 @media all and (max-width: 800px) {
-  .media-dashboard,
-  .media-feature-grid,
-  .media-entry {
+  .mi-feat-grid {
     grid-template-columns: 1fr;
   }
 
-  .media-dashboard h2 {
-    font-size: 1.38rem;
+  .mi-poster-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .media-stats {
-    border-left: 0;
-    border-top: 1px solid var(--lightgray);
+  .mi-poster-grid-album {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media all and (max-width: 600px) {
+  .mi-nav {
+    flex-wrap: wrap;
   }
 
-  .media-stats > div {
-    padding-left: 0;
+  .mi-nav a + a {
+    border-left: none;
   }
 
-  .media-kind-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .media-index a.media-feature-card {
-    grid-template-columns: 5rem minmax(0, 1fr);
-  }
-
-  .media-entry {
+  .mi-root a.mi-feat-card {
     grid-template-columns: 4.5rem minmax(0, 1fr);
   }
 
-  .media-entry-facts {
-    grid-column: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    text-align: left;
-  }
-}
-
-@media all and (max-width: 520px) {
-  .media-kind-nav {
-    grid-template-columns: 1fr;
+  .mi-poster-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem 0.5rem;
   }
 
+  .mi-poster-grid-album {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 `
 
