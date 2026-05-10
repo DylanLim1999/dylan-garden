@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="920" viewBox="0 0 640 920" role="img" aria-labelledby="title desc">
+  <title id="title">Succession cover study</title>
+  <desc id="desc">A restrained corporate cover for a media archive entry.</desc>
+  <rect width="640" height="920" fill="#292724"/>
+  <rect x="88" y="96" width="464" height="728" fill="#e3dfd4" opacity="0.1"/>
+  <rect x="118" y="126" width="404" height="668" fill="none" stroke="#a8874f" stroke-width="3" opacity="0.75"/>
+  <path d="M118 306 H522 M118 512 H522" stroke="#a8874f" stroke-width="2" opacity="0.45"/>
+  <path d="M320 126 V794" stroke="#a8874f" stroke-width="2" opacity="0.45"/>
+  <text x="118" y="210" fill="#eee3d3" font-family="Georgia, serif" font-size="48">Succession</text>
+  <text x="122" y="742" fill="#eee3d3" font-family="Verdana, sans-serif" font-size="22" letter-spacing="6">2018</text>
+</svg>
+

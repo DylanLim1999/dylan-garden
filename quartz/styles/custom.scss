@@ -50,6 +50,28 @@ h6 {
   }
 }
 
+@media screen and (max-width: 800px) {
+  .page > #quartz-body {
+    box-sizing: border-box;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .page > #quartz-body > * {
+    min-width: 0;
+  }
+
+  .page > #quartz-body .center {
+    max-width: calc(100vw - 2rem);
+    min-width: 0;
+    width: 100%;
+  }
+
+  .page > #quartz-body .center p {
+    overflow-wrap: anywhere;
+  }
+}
+
 li.section-li > .section {
   grid-template-columns: fit-content(9em) 3fr 1fr;
 }

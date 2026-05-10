@@ -1,6 +1,7 @@
 import Content from "./pages/Content"
 import TagContent from "./pages/TagContent"
 import FolderContent from "./pages/FolderContent"
+import SmartFolderContent from "./pages/SmartFolderContent"
 import NotFound from "./pages/404"
 import ArticleTitle from "./ArticleTitle"
 import Darkmode from "./Darkmode"
@@ -29,6 +30,7 @@ export {
   Content,
   TagContent,
   FolderContent,
+  SmartFolderContent,
   Darkmode,
   ReaderMode,
   Head,

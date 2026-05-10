@@ -1,4 +1,5 @@
 import { QuartzConfig } from "./quartz/cfg"
+import * as Component from "./quartz/components"
 import * as Plugin from "./quartz/plugins"
 
 /**
@@ -76,7 +77,9 @@ const config: QuartzConfig = {
       Plugin.AliasRedirects(),
       Plugin.ComponentResources(),
       Plugin.ContentPage(),
-      Plugin.FolderPage(),
+      Plugin.FolderPage({
+        pageBody: Component.SmartFolderContent(),
+      }),
       Plugin.TagPage(),
       Plugin.ContentIndex({
         enableSiteMap: true,
