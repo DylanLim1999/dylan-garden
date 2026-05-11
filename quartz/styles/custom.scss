@@ -279,3 +279,241 @@ tbody tr:hover {
   font-size: 0.92rem;
 }
 
+// ── Dappled light effect ──
+
+#quartz-root {
+  isolation: isolate;
+}
+
+#dappled-light {
+  animation-duration: 0s;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  pointer-events: none;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  isolation: isolate;
+
+  --day: #faf9f6;
+  --evening: #d4a574;
+  --dusk: #8b6040;
+  --night: #1a1918;
+  --dawn: #231f1c;
+  --morning: #a89f94;
+
+  --shadow: #1a1917;
+  --bounce-light: #fffffc;
+  --timing-fn: cubic-bezier(0.455, 0.19, 0, 0.985);
+
+  body.animation-ready & {
+    animation-play-state: running;
+    animation-duration: 1s;
+    animation-name: sunrise;
+  }
+
+  [saved-theme="dark"] body.animation-ready & {
+    animation-duration: 1.5s;
+    animation-name: sunset;
+  }
+
+  [saved-theme="dark"] & {
+    --shadow: #0e0d0c;
+    --bounce-light: #2a2520;
+  }
+
+  & > #progressive-blur {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+    & > div {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      backdrop-filter: blur(var(--blur-amount));
+      mask-image: linear-gradient(
+        252deg,
+        transparent,
+        transparent var(--stop1),
+        black var(--stop2),
+        black
+      );
+
+      &:nth-child(1) {
+        --blur-amount: 8px;
+        --stop1: 0%;
+        --stop2: 0%;
+      }
+
+      &:nth-child(2) {
+        --blur-amount: 72px;
+        --stop1: 30%;
+        --stop2: 60%;
+      }
+    }
+  }
+
+  #glow {
+    position: absolute;
+    background: linear-gradient(309deg, var(--bounce-light), var(--bounce-light) 20%, transparent);
+    transition: background 1s var(--timing-fn);
+    height: 100%;
+    width: 100%;
+    opacity: 0.5;
+  }
+
+  #glow-bounce {
+    content: "";
+    position: absolute;
+    background: linear-gradient(355deg, var(--bounce-light) 0%, transparent 30%, transparent 100%);
+    transition: background 1s var(--timing-fn);
+    opacity: 0.5;
+    height: 100%;
+    width: 100%;
+    bottom: 0;
+  }
+
+  & > .perspective {
+    position: absolute;
+    transition:
+      transform 1.7s var(--timing-fn),
+      opacity 4s ease;
+    top: -30vh;
+    right: 0;
+    width: 80vw;
+    height: 130vh;
+    opacity: 0.07;
+    background-blend-mode: darken;
+    transform-origin: top right;
+    transform-style: preserve-3d;
+    transform: matrix3d(0.75, -0.0625, 0, 0.0008, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+    [saved-theme="dark"] & {
+      opacity: 0.3;
+      transform: matrix3d(0.8333, 0.0833, 0, 0.0003, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+  }
+
+  #leaves {
+    position: absolute;
+    background-size: cover;
+    background-repeat: no-repeat;
+    bottom: 0px;
+    right: -600px;
+    width: 1600px;
+    height: 1400px;
+    background-image: url("/static/leaves.png");
+    perspective: 400px;
+    animation: billow 8s ease-in-out infinite;
+  }
+
+  #blinds {
+    position: relative;
+    width: 100%;
+
+    & .shutter,
+    & .bar {
+      background-color: var(--shadow);
+    }
+
+    & .shutter {
+      width: 100%;
+      height: 40px;
+      transition: height 1s var(--timing-fn);
+
+      [saved-theme="dark"] & {
+        height: 80px;
+      }
+    }
+
+    & .shutters {
+      display: flex;
+      flex-direction: column;
+      align-items: end;
+      gap: 60px;
+      transition: gap 1s var(--timing-fn);
+
+      [saved-theme="dark"] & {
+        gap: 20px;
+      }
+    }
+
+    & > .vertical {
+      top: 0;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+
+      & > .bar {
+        width: 12px;
+        height: 100%;
+      }
+    }
+  }
+}
+
+@keyframes sunrise {
+  0% {
+    background-color: var(--night);
+  }
+
+  10% {
+    background-color: var(--dawn);
+  }
+
+  35% {
+    background-color: var(--morning);
+  }
+
+  100% {
+    background-color: var(--day);
+  }
+}
+
+@keyframes sunset {
+  0% {
+    background-color: var(--day);
+  }
+
+  30% {
+    background-color: var(--evening);
+  }
+
+  60% {
+    background-color: var(--dusk);
+  }
+
+  90% {
+    background-color: var(--dawn);
+  }
+
+  100% {
+    background-color: var(--night);
+  }
+}
+
+@keyframes billow {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) scale(1);
+  }
+
+  18% {
+    transform: rotateX(1deg) rotateY(2deg) scale(1.03);
+  }
+
+  32% {
+    transform: rotateX(-4deg) rotateY(-2deg) scale(0.96);
+  }
+
+  66% {
+    transform: rotateX(3deg) rotateY(-1deg) scale(1.04);
+  }
+
+  100% {
+    transform: rotateX(0deg) rotateY(0deg) scale(1);
+  }
+}
+
