@@ -47,16 +47,6 @@ function dateTime(value: string | undefined): number {
   return value ? Date.parse(value) || 0 : 0
 }
 
-function formatDate(value: string | undefined): string {
-  const time = dateTime(value)
-  if (time === 0) return "--"
-  const d = new Date(time)
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, "0")
-  const day = String(d.getDate()).padStart(2, "0")
-  return `${y}-${m}-${day}`
-}
-
 function coverUrl(currentSlug: FullSlug, cover: string | undefined): string | undefined {
   if (!cover) return undefined
   if (/^https?:\/\//i.test(cover) || cover.startsWith("/")) return cover
@@ -91,7 +81,6 @@ function sortRecent(a: MediaItem, b: MediaItem): number {
   if (a.sortTime !== b.sortTime) return b.sortTime - a.sortTime
   return a.title.localeCompare(b.title, "zh-Hans-CN", { numeric: true, sensitivity: "base" })
 }
-
 
 function Cover({ item, currentSlug }: { item: MediaItem; currentSlug: FullSlug }) {
   const src = coverUrl(currentSlug, item.cover)
