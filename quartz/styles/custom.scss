@@ -9,8 +9,6 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-/* 字间距与行间距微调 */
-
 body {
   font-size: 16px;
   font-family: var(--bodyFont);
@@ -28,7 +26,6 @@ pre {
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-/* 段落文字细调 */
 .center p {
   letter-spacing: 0.02em;
   line-height: 1.8em;
@@ -74,5 +71,223 @@ h6 {
 
 li.section-li > .section {
   grid-template-columns: fit-content(9em) 3fr 1fr;
+}
+
+// ── Elegance refinements ──
+
+a {
+  transition:
+    color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.internal {
+  transition:
+    color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--tertiary) 8%, transparent);
+  }
+}
+
+.article-title {
+  margin: 2.5rem 0 0.25rem 0;
+  letter-spacing: -0.01em;
+}
+
+.content-meta,
+.page-listing > p {
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+  opacity: 0.72;
+}
+
+hr {
+  height: 1px;
+  border: none;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--lightgray) 20%,
+    var(--gray) 50%,
+    var(--lightgray) 80%,
+    transparent
+  );
+  margin: 2.5rem auto;
+}
+
+blockquote {
+  border-left: 2px solid var(--secondary);
+  padding-left: 1.2rem;
+  margin: 1.5rem 0;
+  opacity: 0.88;
+  transition:
+    border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+article img {
+  box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.08);
+  transition:
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+  }
+}
+
+:root[saved-theme="dark"] article img {
+  box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.35);
+  }
+}
+
+code:not(pre code) {
+  border-radius: 4px;
+  padding: 0.15rem 0.35rem;
+  font-size: 0.88em;
+  border: 1px solid color-mix(in srgb, var(--lightgray) 60%, transparent);
+}
+
+a.internal.tag-link {
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.9em;
+  transition:
+    color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-title a {
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+footer {
+  border-top: 1px solid color-mix(in srgb, var(--lightgray) 50%, transparent);
+  padding-top: 1.5rem;
+  margin-top: 3rem;
+  font-size: 0.88rem;
+}
+
+.explorer-content ul li > a {
+  transition:
+    color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.folder-container div > a,
+.folder-container div > button span {
+  transition: color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.folder-icon {
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+ul.toc-content.overflow > li > a {
+  transition:
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.backlinks > ul.overflow > li > a {
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search > .search-button {
+  transition:
+    border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    border-color: var(--gray);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.callout {
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    box-shadow: 0 2px 12px -4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+h1[id] > a[href^="#"],
+h2[id] > a[href^="#"],
+h3[id] > a[href^="#"],
+h4[id] > a[href^="#"],
+h5[id] > a[href^="#"],
+h6[id] > a[href^="#"] {
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.table-container > table {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th {
+  border-bottom: 2px solid color-mix(in srgb, var(--gray) 60%, transparent);
+}
+
+tr {
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: color-mix(in srgb, var(--lightgray) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--lightgray) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--lightgray);
+  border-radius: 3px;
+
+  &:hover {
+    background-color: var(--gray);
+  }
+}
+
+.popover > .popover-inner {
+  box-shadow:
+    0 8px 32px -8px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+}
+
+.footnotes {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--lightgray) 70%, transparent);
+  font-size: 0.92rem;
 }
 
