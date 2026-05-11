@@ -44,7 +44,7 @@ function parseTimeline(tree: HtmlRoot): TimelineGroup[] {
   return groups
 }
 
-const Timeline: QuartzComponent = ({ fileData, tree }: QuartzComponentProps) => {
+const Timeline: QuartzComponent = ({ tree }: QuartzComponentProps) => {
   const groups = parseTimeline(tree as HtmlRoot)
 
   if (groups.length === 0) {

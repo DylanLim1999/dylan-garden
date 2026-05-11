@@ -30,7 +30,22 @@ const explorer = Component.Explorer({
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
-  afterBody: [],
+  afterBody: [
+    Component.Comments({
+      provider: "giscus",
+      options: {
+        repo: "DylanLim1999/dylan-garden",
+        repoId: "R_kgDOSYjtMg",
+        category: "Announcements",
+        categoryId: "DIC_kwDOSYjtMs4C8xF3",
+        mapping: "pathname",
+        strict: true,
+        reactionsEnabled: true,
+        inputPosition: "bottom",
+        lang: "zh-CN",
+      },
+    }),
+  ],
   footer: Component.Footer({
     links: {},
   }),

@@ -9,7 +9,7 @@ type Options = {
     repo: `${string}/${string}`
     repoId: string
     category: string
-    categoryId: string
+    categoryId?: string
     themeUrl?: string
     lightTheme?: string
     darkTheme?: string
@@ -32,6 +32,10 @@ export default ((opts: Options) => {
       typeof fileData.frontmatter?.comments !== "undefined" &&
       (!fileData.frontmatter?.comments || fileData.frontmatter?.comments === "false")
     if (disableComment) {
+      return <></>
+    }
+
+    if (!opts.options.categoryId) {
       return <></>
     }
 
